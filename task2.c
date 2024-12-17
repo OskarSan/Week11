@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 int main(int argc, char *argv[]) {
     FILE *fp;
@@ -33,17 +34,18 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
 
-
+        
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO); 
         close(pipefd[1]); 
 
         execlp("/bin/sh", "sh", "-c", command, (char *) NULL);
-        perror("execlp"); // If execlp fails
+        perror("execlp"); 
         exit(EXIT_FAILURE);
 
 
     } else {
+
         close(pipefd[1]);
         while (read(pipefd[0], buffer, sizeof(buffer) - 1) != 0) {
             printf("%s", buffer);
